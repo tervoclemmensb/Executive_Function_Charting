@@ -172,7 +172,24 @@ PNCall<-(ggPNCalllatfitsacc)/(PNCderivFacc$returnplot+PNCderivFlat$returnplot)/(
 ggsave(PNCall,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Figures/Sensplots/PNCpsysens.pdf",height=6,width=8)
 
 #########all panels#########
-lunaallwithNCANDAall<-(gglunaalllatfitsacc+ggNCANDAalllatfitsacc)/(lunaderivFacc$returnplot+lunaderivFlat$returnplot+NCANDAderivFacc$returnplot+NCANDAderivFlat$returnplot)/(lunaderivMacc$returnplot+lunaderivMlat$returnplot+NCANDAderivMacc$returnplot+NCANDAderivMlat$returnplot)+patchwork::plot_layout(heights = c(3,1,1))
+lunaallwithNCANDAall<-(gglunaalllatfitsacc+ggNCANDAalllatfitsacc)/(lunaderivfullacc$returnplot+lunaderivfulllat$returnplot+NCA$returnplot+NCANDAderivFlat$returnplot)/(lunaderivMacc$returnplot+lunaderivMlat$returnplot+NCANDAderivMacc$returnplot+NCANDAderivMlat$returnplot)+patchwork::plot_layout(heights = c(3,1,1))
+
+alllunafits$dataset<-"Luna"
+allNCANDAfits$dataset<-"NCANDA"
+allNKIfits$dataset<-"NKI"
+allPNCfits$dataset<-"PNC"
+
+outvars<-c("pred","fit","sampletyp","se","outcomelabel","dataset")
+
+supdatafits<-rbind(alllunafits[,outvars],allNCANDAfits[,outvars]) %>% rbind(.,allNKIfits[,outvars]) %>%
+  rbind(.,allPNCfits[,outvars])
+
+write.csv(supdatafits,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Data/SupportingData/Sup17.csv")
+
+supdatafits$dataset_sampletyp<-paste(supdatafits$dataset,supdatafits$sampletyp)
+ggplot(supdatafits,aes(x=pred,y=fit,colour=sampletyp))+geom_line()+
+  geom_ribbon(aes(ymin=fit-2*se,ymax=fit+2*se,fill=sampletyp),colour="black",alpha=.5)+
+  facet_grid(rows=vars(dataset_sampletyp),cols=vars(outcomelabel),scales = "free")
 
 
 

@@ -95,7 +95,7 @@ gpefvarspattern<-LNCDR::lunaize(gpefvarspattern)+theme(legend.title = element_bl
 
 ####savelist######
 ###no sensivity because no overlap EF subdomains. 
-savelistout<-list(propbyage=propbyage,gpefvarspattern=gpefvarspattern,groupslong=groupslong)
+savelistout<-list(propbyage=propbyage,propbyagebyvar=propbyagebyvar,gpefvarspattern=gpefvarspattern,groupslong=groupslong)
 save(savelistout,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Figures/Agecomspec/PNCagecomspecalldata.Rdata")
 
 

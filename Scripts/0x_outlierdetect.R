@@ -57,7 +57,7 @@ coglongwinds_means_varswitid$id<-coglongwinds_means$id
 coglongmdcensorwithsubcensor<-coglongmdcensor
 coglongmdcensorwithsubcensor<-distributeNAsforoutliermeans(coglongwinds_means_varswitid,coglongmdcensorwithsubcensor,allefvars,idvar="id")
 coglongmdcensorwithsubcensor<-coglongmdcensorwithsubcensor[rowSums(is.na(coglongmdcensorwithsubcensor[,allefvars])) != ncol(coglongmdcensorwithsubcensor[,allefvars]), ]
-###196 participants 668 total visits#####
+###196 participants 666 total visits#####
 ##########write data########
 write.csv(coglongmdcensorwithsubcensor,"~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/data/btc_R03cleaneddata_20220214.outlierremoved.csv")
 

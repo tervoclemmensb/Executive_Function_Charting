@@ -61,6 +61,9 @@ ggsave(gghist,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03
 #                                                  axis.ticks.y = element_blank(), axis.text.y = element_blank())+
 #   scale_colour_manual(values=c("white","#F8766D","#00BFC4"))+theme(legend.title = element_blank(),legend.position="top") 
 
+
+Luna_coglongdata<-coglongdata[,c("age","visitnumplot")]
+Luna_coglongdata$dataset<-"Luna"
 ########################################
 ############NCANDA######################
 coglongdata<-read.csv("~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/NCANDA/Data/btc_NCANDAscoredmeasures_20220306.outlierremoved.compositeacclat.csv")
@@ -89,6 +92,9 @@ gghistNCANDA <- lunaize(gghistNCANDA) + ylab("Visit Count") + xlab("Age (years)"
 
 ggsave(gghistNCANDA,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Figures/Waterfallplots/NCANDAwaterfallplot.hist.pdf",height=7,width=7)
 
+NCANDA_coglongdata<-coglongdata[,c("age","visitnumplot")]
+NCANDA_coglongdata$dataset<-"NCANDA"
+
 ######NKI########
 coglongdata<-read.csv("~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/NKI/Data/btc_NKIscoredmeasures_20220306.outlierremoved.compositeacclat.csv")
 coglongdata$id<-as.factor(coglongdata$subject)
@@ -109,7 +115,8 @@ gghistNKI <- ggplot(coglongdata) + aes(x = age,colour=visitnumplot,fill=visitnum
 gghistNKI <- lunaize(gghistNKI) + ylab("Visit Count") + xlab("Age (years)") +theme(text = element_text(size=26))+theme(legend.position = "none")+scale_y_continuous(limits = c(0,45),expand = c(0, 0))
 ggsave(gghistNKI,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Figures/Waterfallplots/NKIwaterfallplot.hist.pdf",height=7,width=7)
 
-
+NKI_coglongdata<-coglongdata[,c("age","visitnumplot")]
+NKI_coglongdata$dataset<-"NKI"
 ########################################
 ############PNC######################
 coglongdata<-read.csv("~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/PNC/Data/btc_PNCscoredmeasures_20220306.outlierremoved.compositeacclat.csv")
@@ -125,7 +132,7 @@ coglongdata$visitnumplot<-factor(1)
 gghistPNC <- ggplot(coglongdata) + aes(x = age,colour=visitnumplot,fill=visitnumplot) + geom_histogram(colour="black")+scale_color_manual(values=c(rev(mycolors[10])))+scale_fill_manual(values=c(rev(mycolors[10])))+
   coord_cartesian(xlim =c(8,35))
 
-gghistPNC <- lunaize(gghistPNC) + ylab("Visit Count") + xlab("Age (years)") +theme(text = element_text(size=26))+theme(legend.position = "none")+scale_y_continuous(limits = c(0,450), expand = c(0, 0))
+gghistPNC <- lunaize(gghistPNC) + ylab("Visit Count") + xlab("Age (years)") +theme(text = element_text(size=26))+theme(legend.position = "none")+scale_y_continuous(limits = c(0,500), expand = c(0, 0))
 
 library(patchwork)
 allhists<-(gghist)/ plot_spacer()/ (gghistNCANDA)/plot_spacer()/(gghistNKI)/plot_spacer()/(gghistPNC) + plot_layout(heights = c(6, 2.5 ,6,2.5,6,2.5,6))
@@ -134,4 +141,13 @@ ggsave(allhists,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R
 allhistquads<-(gghist+gghistNCANDA)/plot_spacer()/(gghistNKI+gghistPNC)+plot_layout(heights = c(6, 1.75 ,6))
 ggsave(allhistquads,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Figures/Waterfallplots/allsampleswatefall.quadhist.pdf",height=12,width=14)
 
+PNC_coglongdata<-coglongdata[,c("age","visitnumplot")]
+PNC_coglongdata$dataset<-"PNC"
+###all sup data####
+Luna_coglongdata
+NCANDA_coglongdata
+NKI_coglongdata
+PNC_coglongdata
 
+allcoghistdata<-rbind(Luna_coglongdata,NCANDA_coglongdata) %>% rbind(.,NKI_coglongdata) %>% rbind(.,PNC_coglongdata)
+write.csv(allcoghistdata,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Data/SupportingData/Sup1.csv")

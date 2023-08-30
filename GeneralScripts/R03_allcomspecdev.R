@@ -16,6 +16,7 @@ Lunaprobbyagesens$dataset<-"LUNA"
 
 ggLunasens<-savelistout$gpefvarspatternsens+theme(legend.position = "none")
 
+Lunaoutsavebyvar<-savelistout$propbyagebyvarsens
 ##NCANDA##
 load(file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Figures/Agecomspec/NCANDAagecomspecalldata.Rdata")
 NCANDAprobbyage<-savelistout$propbyage$byvardf
@@ -24,6 +25,7 @@ NCANDAprobbyage$dataset<-"NCANDA"
 
 ggNCANDA<-savelistout$gpefvarspattern+theme(legend.position = "none")
 
+NCANDAoutsavebyvar<-savelistout$propbyagebyvar
 ##NKI###
 load(file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Figures/Agecomspec/NKIagecomspecalldata.Rdata")
 NKIprobbyage<-savelistout$propbyage$byvardf
@@ -36,6 +38,7 @@ NKIprobbyagesens$dataset<-"NKI"
 
 ggNKIsens<-savelistout$gpefvarspatternsens+theme(legend.position = "none")
 
+NKIoutsavebyvar<-savelistout$propbyagebyvar
 ##PNC##
 load(file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Figures/Agecomspec/PNCagecomspecalldata.Rdata")
 PNCprobbyage<-savelistout$propbyage$byvardf
@@ -44,7 +47,7 @@ PNCprobbyage$dataset<-"PNC"
 names(PNCprobbyage)[names(PNCprobbyage)=="type"]<-"vartype"
 ggPNC<-savelistout$gpefvarspattern+theme(legend.position = "none")
 
-
+PNCoutsavebyvar<-savelistout$propbyagebyvar
 #####alldata#######
 allprobbyagesens<-plyr::rbind.fill(Lunaprobbyagesens,NCANDAprobbyage) %>% plyr::rbind.fill(.,NKIprobbyagesens) %>% plyr::rbind.fill(.,PNCprobbyage) ###sens version in Luna and NKI ensures all tests are out of meausre and out of domain
 
@@ -109,43 +112,86 @@ gpefvarspattern_meta<-LNCDR::lunaize(gpefvarspattern_meta)+theme(legend.title = 
 allspecsensgg<-(ggLunasens+ggNCANDA)/(ggNKIsens+ggPNC)+(gpefvarspattern_meta+plot_spacer())
 ggsave(allspecsensgg,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Figures/Agecomspec/allcomspec.pdf",height=12,width=10)
 
-# ########iter pred#######
-#deprecated switched to iter specific script
-# load(file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Figures/Agecomspec/LUNAiterpropbyage.Rdata")
-# propbyageitersens_LUNA<-propbyageitersens_save
-# propbyageitersens_LUNA$nonspecdev_propofage[propbyageitersens_LUNA$nonspecdev_propofage<0]<-0###setting to negative to zero for aggregation
-# propbyageitersens_LUNA$nonspecdev_propofage[propbyageitersens_LUNA$nonspecdev_propofage>1]<-1 ###setting over one to one for aggregation
-# 
-# propbyageitersens_LUNA$nonspecdev_propofage100<-propbyageitersens_LUNA$nonspecdev_propofage*100
-# 
-# ggplot(propbyageitersens_LUNA,aes(x=as.factor(thismanyvars),y=nonspecdev_propofage100))+geom_boxplot()
-# propbyageitersens_LUNA$dataset<-"Luna"
-# load(file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Figures/Agecomspec/NKIiterpropbyage.Rdata")
-# propbyageitersens_NKI<-propbyageitersens_save
-# propbyageitersens_NKI$nonspecdev_propofage[propbyageitersens_NKI$nonspecdev_propofage<0]<-0###setting to negative to zero for aggregation
-# propbyageitersens_NKI$nonspecdev_propofage[propbyageitersens_NKI$nonspecdev_propofage>1]<-1 ###setting over one to one for aggregation
-# 
-# propbyageitersens_NKI$nonspecdev_propofage100<-propbyageitersens_NKI$nonspecdev_propofage*100
-# 
-# ggplot(propbyageitersens_NKI,aes(x=as.factor(thismanyvars),y=nonspecdev_propofage100))+geom_boxplot()
-# propbyageitersens_NKI$dataset<-"NKI"
-# ########
-# allpropdata_LUNANKI<-plyr::rbind.fill(propbyageitersens_LUNA,propbyageitersens_NKI)
-# medians<-allpropdata_LUNANKI %>% group_by(dataset,thismanyvars) %>% dplyr::summarize(nonspecdev_propofage100med=median(nonspecdev_propofage100),se=sd(nonspecdev_propofage100)/sqrt(n()),
-#                                                                                      upper=nonspecdev_propofage100med+2*se,lower=nonspecdev_propofage100med-2*se,uniquevals=length(unique(nonspecdev_propofage100)),uniqueoutcomes=length(unique(outcome)))
-# propbyvarnumber<-ggplot(medians,aes(x=thismanyvars,y=nonspecdev_propofage100med,ymin=lower,ymax=upper,shape=dataset))+geom_point(colour="grey28")+geom_smooth(method="lm",se=FALSE,colour="grey28")+
-#   scale_x_continuous(breaks=c(2:max(medians$thismanyvars)))
-# propbyvarnumber<-LNCDR::lunaize(propbyvarnumber)+xlab("# Vars Included in Composite")+ylab("% of Age-Related EF\nby Common EF")+theme(legend.position = "top",legend.title = element_blank())
-# 
-# 
-# ###allpropdata_LUNANKI limit to 7 vars for Luna as this is the max where all outcomes are included#####
-# allpropdata_LUNANKI[allpropdata_LUNANKI$dataset=="Luna" & allpropdata_LUNANKI$thismanyvars>7,]<-NA
-# allpropdata_LUNANKI<-allpropdata_LUNANKI[!is.na(allpropdata_LUNANKI$outcome),]
-# 
-# propbyvarnumber<-ggplot(allpropdata_LUNANKI,aes(x=as.factor(thismanyvars),y=nonspecdev_propofage100))+geom_boxplot(colour="grey55")+geom_smooth(method = "gam",formula=y~s(x,k=6),se=FALSE, aes(group=1),colour="grey28")+facet_grid(cols=vars(dataset),scale="free_x")
-# propbyvarnumber<-LNCDR::lunaize(propbyvarnumber)+xlab("# Vars Included in Composite")+ylab("% of Age-Related EF\nby Common EF")+theme(legend.position = "top",legend.title = element_blank())
-# 
-# 
-# 
-# allspecsensggwithscatter<-(ggLunasens+ggNCANDA)/(ggNKIsens+ggPNC)/(gpefvarspattern_meta+propbyvarnumber)
-# ggsave(allspecsensggwithscatter,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Figures/Agecomspec/allcomspec.withscatter.pdf",height=12,width=10)
+########save outdata
+meta_save_r<-specprobmeta_long[,c("vartype","typef","prop100")]
+meta_save_r$dataset<-"meta"
+meta_save_r$groupbytypef<-"meta"
+
+####individual
+
+Lunaoutsavebyvar
+NCANDAoutsavebyvar
+NKIoutsavebyvar
+PNCoutsavebyvar
+allbyvarsaveout<-plyr::rbind.fill(Lunaoutsavebyvar,NCANDAoutsavebyvar) %>% 
+  plyr::rbind.fill(.,NKIoutsavebyvar) %>% plyr::rbind.fill(PNCoutsavebyvar)
+
+allbyvarsaveout_r<-allbyvarsaveout[,c("groupbytypef","vartype","typef","prop100","dataset")]
+allbyvarsaveout_rwithmeta<-plyr::rbind.fill(allbyvarsaveout_r,meta_save_r)
+
+write.csv(allbyvarsaveout_rwithmeta,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Data/SupportingData/Figure4.csv")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+########iter pred#######
+
+load(file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Figures/Agecomspec/LUNAiterpropbyage.Rdata")
+propbyageitersens_LUNA<-propbyageitersens_save
+propbyageitersens_LUNA$nonspecdev_propofage[propbyageitersens_LUNA$nonspecdev_propofage<0]<-0###setting to negative to zero for aggregation
+propbyageitersens_LUNA$nonspecdev_propofage[propbyageitersens_LUNA$nonspecdev_propofage>1]<-1 ###setting over one to one for aggregation
+
+propbyageitersens_LUNA$nonspecdev_propofage100<-propbyageitersens_LUNA$nonspecdev_propofage*100
+
+ggplot(propbyageitersens_LUNA,aes(x=as.factor(thismanyvars),y=nonspecdev_propofage100))+geom_boxplot()
+propbyageitersens_LUNA$dataset<-"Luna"
+load(file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Figures/Agecomspec/NKIiterpropbyage.Rdata")
+propbyageitersens_NKI<-propbyageitersens_save
+propbyageitersens_NKI$nonspecdev_propofage[propbyageitersens_NKI$nonspecdev_propofage<0]<-0###setting to negative to zero for aggregation
+propbyageitersens_NKI$nonspecdev_propofage[propbyageitersens_NKI$nonspecdev_propofage>1]<-1 ###setting over one to one for aggregation
+
+propbyageitersens_NKI$nonspecdev_propofage100<-propbyageitersens_NKI$nonspecdev_propofage*100
+
+ggplot(propbyageitersens_NKI,aes(x=as.factor(thismanyvars),y=nonspecdev_propofage100))+geom_boxplot()
+propbyageitersens_NKI$dataset<-"NKI"
+########
+allpropdata_LUNANKI<-plyr::rbind.fill(propbyageitersens_LUNA,propbyageitersens_NKI)
+medians<-allpropdata_LUNANKI %>% group_by(dataset,thismanyvars) %>% dplyr::summarize(nonspecdev_propofage100med=median(nonspecdev_propofage100),se=sd(nonspecdev_propofage100)/sqrt(n()),
+                                                                                     upper=nonspecdev_propofage100med+2*se,lower=nonspecdev_propofage100med-2*se,uniquevals=length(unique(nonspecdev_propofage100)),uniqueoutcomes=length(unique(outcome)))
+propbyvarnumber<-ggplot(medians,aes(x=thismanyvars,y=nonspecdev_propofage100med,ymin=lower,ymax=upper,shape=dataset))+geom_point(colour="grey28")+geom_smooth(method="lm",se=FALSE,colour="grey28")+
+  scale_x_continuous(breaks=c(2:max(medians$thismanyvars)))
+propbyvarnumber<-LNCDR::lunaize(propbyvarnumber)+xlab("# Vars Included in Composite")+ylab("% of Age-Related EF\nby Common EF")+theme(legend.position = "top",legend.title = element_blank())
+
+
+###allpropdata_LUNANKI limit to 7 vars for Luna as this is the max where all outcomes are included#####
+allpropdata_LUNANKI[allpropdata_LUNANKI$dataset=="Luna" & allpropdata_LUNANKI$thismanyvars>7,]<-NA
+allpropdata_LUNANKI<-allpropdata_LUNANKI[!is.na(allpropdata_LUNANKI$outcome),]
+
+propbyvarnumber<-ggplot(allpropdata_LUNANKI,aes(x=as.factor(thismanyvars),y=nonspecdev_propofage100))+geom_boxplot(colour="grey55")+geom_smooth(method = "gam",formula=y~s(x,k=6),se=FALSE, aes(group=1),colour="grey28")+facet_grid(cols=vars(dataset),scale="free_x")
+propbyvarnumber<-LNCDR::lunaize(propbyvarnumber)+xlab("# Vars Included in Composite")+ylab("% of Age-Related EF\nby Common EF")+theme(legend.position = "top",legend.title = element_blank())
+ggsave(propbyvarnumber,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Figures/Agecomspec/allcomspec.box.pdf",height=12,width=10)
+
+supportingdata_r_s<-allpropdata_LUNANKI[,c("thismanyvars","nonspecdev_propofage100","dataset")]
+
+write.csv(supportingdata_r_s,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Data/SupportingData/Sup10.csv")
+
+allspecsensggwithscatter<-(ggLunasens+ggNCANDA)/(ggNKIsens+ggPNC)/(gpefvarspattern_meta+propbyvarnumber)
+ggsave(propbyvarnumber,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Figures/Agecomspec/allcomspec.withscatter.pdf",height=12,width=10)

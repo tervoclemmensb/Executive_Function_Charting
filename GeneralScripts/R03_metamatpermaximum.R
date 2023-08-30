@@ -115,7 +115,7 @@ allinterpolatedfits$varglobal[allinterpolatedfits$var %in% PCPTlat]<-"PCPTlat"
 ####plot percent of maximum  for those significant age-related change 
 ###calculating this metric in measures with no change would  bias estimates to appear to mature earlier
 allinterpolatedfitssig<-allinterpolatedfits[!(allinterpolatedfits$outcome %in% c(lunanonsig,ncandanonsig)),] ###all sig in NKI and PNC
-allinterpolatedfitssig<-allinterpolatedfits[!(allinterpolatedfits$dataset %in% c("PNC")),] ###sensitivity removing PNC dataset
+#allinterpolatedfitssig<-allinterpolatedfitssig[!(allinterpolatedfitssig$dataset %in% c("PNC")),] ###sensitivity removing PNC dataset
 
 accmetafitsig<-metabyagethreelevel(interpolatedagedfs=allinterpolatedfitssig[allinterpolatedfitssig$type=="acc",],agevar="ages",valcol="fit_value",secol ="se_value",variablenestvar="varglobal",datasetvar = "dataset") ###three level meta to define basis function
 accmetafitsig$percentmax<-scales::rescale(accmetafitsig$estimate)
@@ -161,6 +161,26 @@ ggderivpercentfit<-LNCDR::lunaize(ggderivpercentfit)+xlab("Age (years)")+ylab("%
 ggsave(ggderivpercentfit,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Figures/MatRasters/percentchangesiglat.fit.plot.pdf",height=4,width=6)
 
 
+####supporting data save#######
+metafit<-accmetafitsigsmooth[,c("pred","fitscale")]
+metafit$varbydataset<-"meta acc"
+metafit$dataset<-"meta"
+allfitsacc_r<-allfitsacc[,c("pred","fitscale","dataset","varbydataset")]
 
+allaccfits<-plyr::rbind.fill(metafit,allfitsacc_r)
+allaccfits$type<-"accuracy"
+
+
+metafitlat<-latmetafitsigsmooth[,c("pred","fitscale")]
+metafitlat$varbydataset<-"meta lat"
+metafitlat$dataset<-"meta"
+allfitslat_r<-allfitslat[,c("pred","fitscale","dataset","varbydataset")]
+
+alllatfits<-plyr::rbind.fill(metafitlat,allfitslat_r)
+alllatfits$type<-"latency"
+
+allsave<-rbind(allaccfits,alllatfits)
+
+write.csv(allsave,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Data/SupportingData/Sup5.csv")
 
 

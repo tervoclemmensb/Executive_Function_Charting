@@ -32,6 +32,7 @@ write.csv(GENDER_R,"~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03
 
 ###Measures
 CANTAB_Tmeasures<-CANTAB_nowarn[,c("id","Age","d8","MOT.Median.latency","MOT.Mean.error","SOC.Problems.solved.in.minimum.moves","SOC.Overallmeaninitialthinkingtime","SOC.Overallmeansubsequentthinkingtime","DMS.Percent.correct","DMS.Median.correct.latency","SSP.Span.length","SSP.Mean.time.to.first.response","SSP.Mean.time.to.last.response")]
+CANTAB_Tmeasures<-CANTAB_Tmeasures[!duplicated(CANTAB_Tmeasures[,c("id","d8")]),]
 CANTABdemo<-CANTAB_nowarn[,c("Age","SOC.Problems.solved.in.minimum.moves","DMS.Percent.correct","SSP.Span.length")]
 CANTABdemo_d<-CANTABdemo[,c("SOC.Problems.solved.in.minimum.moves","DMS.Percent.correct","SSP.Span.length")]
 

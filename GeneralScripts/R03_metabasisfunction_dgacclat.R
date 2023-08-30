@@ -127,6 +127,7 @@ metabyageLatencycomposite_smooth$dataset<-"meta"
 ggallaccfits<-ggplot(allfits[allfits$outcome=="Accuracycomposite",],aes(x=pred,y=fit,fill=dataset))+geom_ribbon(aes(ymin=fit-2*se,ymax=fit+2*se,fill=dataset,alpha=dataset),colour="black")+
   geom_line(colour="black",se=FALSE)+
   scale_fill_manual(values=c("black","black","black","black","black"))+scale_alpha_manual(values=c(.1,.35,.70,1,.80))+
+  scale_x_continuous(limits = c(8, 36),breaks=(c(10,15,20,25,30,35)))+
   geom_line(data=metabyageAcccomposite_smooth,aes(x=pred,y=fit),colour="#c9270e",linetype="solid",size=2)
   #+
   #geom_line(data=metabyageAcccomposite,aes(x=age,y=estimate),colour="#c9270e",linetype="dashed",size=.75) ##visualization switched to separate supplemental
@@ -140,6 +141,7 @@ save(metabyageAcccomposite_smooth,file="~/Library/Mobile\ Documents/com~apple~Cl
 ggalllatfits<-ggplot(allfits[allfits$outcome=="Latencycomposite",],aes(x=pred,y=fit,fill=dataset))+geom_ribbon(aes(ymin=fit-2*se,ymax=fit+2*se,fill=dataset,alpha=dataset),colour="black")+
   geom_line(colour="black",se=FALSE)+
   scale_fill_manual(values=c("black","black","black","black","black"))+scale_alpha_manual(values=c(.1,.35,.70,1,.80))+
+  scale_x_continuous(limits = c(8, 36),breaks=(c(10,15,20,25,30,35)))+
   geom_line(data=metabyageLatencycomposite_smooth,aes(x=pred,y=fit),colour="#2f42bd",linetype="solid",size=2)
   #+
   #geom_line(data=metabyageLatencycomposite,aes(x=age,y=estimate),colour="#2f42bd",linetype="dashed",size=.75) ##visualization switched to separate supplemental
@@ -162,7 +164,22 @@ metabyageLatencycomposite_smoothsave$latency_trajectory_minmaxscale<-scales::res
 metabasissaveall<-merge(metabyageAcccomposite_smoothsave,metabyageLatencycomposite_smoothsave,by=c("age"))
 write.csv(metabasissaveall,"~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Figures/Metabasis/Metabasis.acclat.data.csv")
 
-####visualize against inverse, linear, quadratic for talk
+###save supporting figures#####
+allfits_r<-allfits[,c("outcome","pred","fit","se","dataset")]
+
+metabyageAcccomposite_smooth_r<-metabyageAcccomposite_smooth[,c("pred","fit")]
+metabyageAcccomposite_smooth_r$outcome<-"meta accuracy"
+metabyageLatencycomposite_smooth_r<-metabyageLatencycomposite_smooth[,c("pred","fit")]
+metabyageLatencycomposite_smooth_r$outcome<-"meta latency"
+
+bothmetas<-rbind(metabyageAcccomposite_smooth_r,metabyageLatencycomposite_smooth_r)
+bothmetas$dataset<-"meta"
+
+allsupdata_Fig5A<-plyr::rbind.fill(allfits_r,bothmetas)
+
+write.csv(allsupdata_Fig5A,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Data/SupportingData/Figure5A.csv")
+
+####visualize against inverse, linear, quadratic 
 
 ###lmers
 allfits$invpred<-1/allfits$pred
@@ -183,19 +200,43 @@ preddata$sqpred<-predict(lmerquadfit,newdata=preddata,re.form=NA)
 ggotherfitvis<-ggplot()+
   geom_line(colour="black")+
   scale_fill_manual(values=c("black","black","black","black","black"))+scale_alpha_manual(values=c(.1,.35,.70,1,.80))+
-  geom_line(data=metabyageAcccomposite_smooth,aes(x=pred,y=fit,linetype="basis"),colour="#c9270e",size=2)+
+  geom_line(data=metabyageAcccomposite_smooth,aes(x=pred,y=fit,linetype="GAM"),colour="#c9270e",size=2)+
   geom_line(data=preddata,aes(x=pred,y=linpred,linetype="linear"),colour="#c9270e",size=1)+
   geom_line(data=preddata,aes(x=pred,y=invpred,linetype="inverse"),colour="#c9270e",size=1)+
   geom_line(data=preddata,aes(x=pred,y=sqpred,linetype="quadratic"),colour="#c9270e",size=1)+
-  scale_linetype_manual(name = "Age Model", values = c("basis" = "solid", "linear" = "dashed","inverse"="dotted","quadratic"="twodash"))
+  scale_linetype_manual(name = "Age Model", values = c("GAM" = "solid", "linear" = "dashed","inverse"="dotted","quadratic"="twodash"))
 
-ggotherfitvis<-LNCDR::lunaize(ggotherfitvis)+xlab("Age (years)")+ylab("Executive Function \n (z-score)")+theme(legend.position = "top",legend.title = element_blank())
+ggotherfitvis<-LNCDR::lunaize(ggotherfitvis)+xlab("Age (years)")+ylab("Executive Function \n (z-score)")+theme(legend.position = "top",legend.title = element_blank())+
+  guides(linetype = guide_legend(override.aes = list(size = 1)))+theme(legend.key.width = unit(3, "line"))
   
  # geom_smooth(data=preddata,aes(x=pred,y=fit),method="lm",formula = y=1/x,colour="red",linetype="dashed",se=FALSE)
 
 
+interpdiffaddNA<-function(x,y,xout=seq(min(preddatadiffs$pred),max(preddatadiffs$pred),by=.1)){
+  interpedy<-approx(x=x,y=y,xout=xout)$y
+  diffout<-c(NA,diff(interpedy))
+  return(diffout)
+}
 
+preddatadiffs<-preddata[order(preddata$pred),]
+preddatadiffs_out<-data.frame(do.call(cbind,lapply(preddatadiffs[,c("invpred","linpred","sqpred")],function(y){interpdiffaddNA(x=preddatadiffs$pred,y=y)})))
+preddatadiffs_out$pred<-seq(min(preddatadiffs$pred),max(preddatadiffs$pred),by=.1)
 
+preddatadiffs_out$GAMdiff<-interpdiffaddNA(x=metabyageAcccomposite_smooth$pred,y=metabyageAcccomposite_smooth$fit,xout=preddatadiffs_out$pred)
+
+ggotherfitvis_diff<-ggplot()+
+  geom_line(colour="black")+
+  geom_hline(yintercept = 0,linetype="solid",colour="grey66")+
+  scale_fill_manual(values=c("black","black","black","black","black"))+scale_alpha_manual(values=c(.1,.35,.70,1,.80))+
+  geom_smooth(data=preddatadiffs_out,aes(x=pred,y=GAMdiff,linetype="GAM"),se=FALSE,colour="#c9270e",size=2)+
+  geom_smooth(data=preddatadiffs_out,aes(x=pred,y=linpred,linetype="linear"),se=FALSE,colour="#c9270e",size=1)+
+  geom_smooth(data=preddatadiffs_out,aes(x=pred,y=invpred,linetype="inverse"),se=FALSE,colour="#c9270e",size=1)+
+  geom_smooth(data=preddatadiffs_out,aes(x=pred,y=sqpred,linetype="quadratic"),se=FALSE,colour="#c9270e",size=1)+
+  scale_linetype_manual(name = "Age Model", values = c("GAM" = "solid", "linear" = "dashed","inverse"="dotted","quadratic"="twodash"))
+  
+  
+ggotherfitvis_diff<-LNCDR::lunaize(ggotherfitvis_diff)+xlab("Age (years)")+ylab("Derivative of Executive Function \n (z-score)")+theme(legend.position = "top",legend.title = element_blank())+
+  guides(linetype = guide_legend(override.aes = list(size = 1)))+theme(legend.key.width = unit(3, "line"))
 
 
 

@@ -78,3 +78,22 @@ ggsave(ggscaledall,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Project
 ggscaledallNCANDA<-ggscaledall
 save(ggscaledallNCANDA,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Figures/PracticeVis/NCANDAscaledvisitfits.Rdata")
 
+
+scalefitsallsig_r<-scalefitsallsig[,c("group","sig","pred","fit")]
+scalefitsallsig_r$dataset<-"NCANDA"
+save(scalefitsallsig_r,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Figures/PracticeVis/NCANDAscaledvisitfits.supdata.Rdata")
+
+
+###calculate visit differences#####
+
+datelimit<-coglongdata[,c("id","cnp_age","visitnum")]
+datelimit$visitnumnext<-datelimit$visitnum+1
+datelimit<-merge(datelimit,datelimit,by.x = c("id","visitnum"),by.y = c("id","visitnumnext"))
+
+datelimit$diff<-datelimit$cnp_age.x-datelimit$cnp_age.y
+median((datelimit$diff[-2195]*365)/30) ###one particpant miscoded in distributed data
+range((datelimit$diff[-2195]*365)/30) ###one particpant miscoded in distributed data
+
+
+
+

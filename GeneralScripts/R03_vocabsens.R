@@ -153,4 +153,17 @@ ggPNCalllatfitsacc<-LNCDR::lunaize(ggPNCalllatfitsacc)+xlab("Age (years)")+ylab(
 PNCall<-(ggPNCalllatfitsacc)/(PNCscaledfitbaseacc$returnplot+PNCscaledfitbaseacclat$returnplot)/(PNCscaledfitscovacc$returnplot+PNCscaledfitscovlat$returnplot)/(PNCscaledfitscovacc$returnplot+PNCscaledfitscovlat$returnplot)+patchwork::plot_layout(heights = c(3,1,1,1))
 ggsave(PNCall,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Figures/Sensplots/PNCvocabsens.pdf",height=6,width=8)
 #########all panels#########
+allNCANDAfits$dataset<-"NCANDA"
+allNKIfits$dataset<-"NKI"
+allPNCfits$dataset<-"PNC"
+
+outvars<-c("pred","fit","modeltype","se","outcomelabel","dataset")
+
+supdatafits<-rbind(allNKIfits[,outvars],allNCANDAfits[,outvars]) %>% rbind(.,allPNCfits[,outvars])
+
+write.csv(supdatafits,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Data/SupportingData/Sup16.csv")
+
+ggplot(supdatafits,aes(x=pred,y=fit,colour=modeltype))+geom_line()+
+  geom_ribbon(aes(ymin=fit-2*se,ymax=fit+2*se,fill=modeltype),colour="black",alpha=.5)+
+  facet_grid(rows=vars(dataset),cols=vars(outcomelabel))
 

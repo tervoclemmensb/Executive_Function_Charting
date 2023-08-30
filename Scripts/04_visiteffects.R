@@ -77,3 +77,19 @@ ggsave(ggscaledall,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Project
 ggscaledallLUNA<-ggscaledall
 save(ggscaledallLUNA,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Figures/PracticeVis/LUNAscaledvisitfits.Rdata")
 
+###calculate visit differences#####
+
+datelimit<-coglongdata[,c("id","d8","visitnum")]
+datelimit$d8<-lubridate::ymd(datelimit$d8)
+datelimit$visitnumnext<-datelimit$visitnum+1
+datelimit<-merge(datelimit,datelimit,by.x = c("id","visitnum"),by.y = c("id","visitnumnext"))
+
+datelimit$diff<-datelimit$d8.x-datelimit$d8.y
+
+#####
+scalefitsallsig_r<-scalefitsallsig[,c("group","sig","pred","fit")]
+scalefitsallsig_r$dataset<-"Luna"
+save(scalefitsallsig_r,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Figures/PracticeVis/LUNAscaledvisitfits.supdata.Rdata")
+
+
+

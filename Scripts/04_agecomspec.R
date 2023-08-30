@@ -76,7 +76,7 @@ for (dpi in 1:nrow(domainpairs)){
 
 propbyagesens<-propspecbyage_gam_signflip(df,agevar,comparedfnodomainpairs)
 propbyagebyvarsens<-propbyagesens$byvardf
-propbyagebyvarsens$dataset<-"NKI"
+propbyagebyvarsens$dataset<-"Luna"
 
 propbyagebyvarsens<-pivot_longer(propbyagebyvarsens,cols=c(nonspecdev_propofage,specdev_propofage), names_to="type", values_to="prop")
 propbyagebyvarsens$typef<-factor(ifelse(propbyagebyvarsens$type=="specdev_propofage","Measure Specific","Common EF"),levels=c("Measure Specific","Common EF"))
@@ -115,7 +115,7 @@ gpefvarspatternsens<-LNCDR::lunaize(gpefvarspatternsens)+theme(legend.title = el
 
 ####savelist######
 
-savelistout<-list(propbyagesens=propbyagesens,gpefvarspatternsens=gpefvarspatternsens,groupslong=groupslong)
+savelistout<-list(propbyagesens=propbyagesens,propbyagebyvarsens=propbyagebyvarsens,gpefvarspatternsens=gpefvarspatternsens,groupslong=groupslong)
 save(savelistout,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Figures/Agecomspec/LUNAagecomspecalldata.Rdata")
 
 #######iter######

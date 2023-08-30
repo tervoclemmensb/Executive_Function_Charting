@@ -81,10 +81,11 @@ PNC$sex[PNC$sex %in% c("+")]<-NA ###set + to NA to not bin with M/F (NA and + re
 #######models#######
 ###LUNA
 lunaformula<-as.formula('outcome~s(pred)+s(visitnum)')
-lunascaledfitM<-mgcvscalefits(LUNA[LUNA$sex=="M",],outcomevars = c("Accuracycomposite","Latencycomposite"),predvars = "Ageatvisit",idvar="id",mformula = lunaformula,scale=FALSE)
+lunaformula_m<-as.formula('outcome~s(pred)+s(visitnum,k=9)') ###9 visit max for male participants
+lunascaledfitM<-mgcvscalefits(LUNA[LUNA$sex=="M",],outcomevars = c("Accuracycomposite","Latencycomposite"),predvars = "Ageatvisit",idvar="id",mformula = lunaformula_m,scale=FALSE)
 lunascaledfitM$sex<-"M"
-lunaderivMacc<-multi_mgcvgam_growthrate_multiplot_rasteronly(df=LUNA[LUNA$sex=="M",],outcomevars = c("Accuracycomposite"),idvar="id",predvars='Ageatvisit',mformula=lunaformula,datarangegrey=TRUE,derivrangemanual=c(-.2,.2),derivcolourmanual=c("grey33","#00BFC4"),devageguides=FALSE,zscale=FALSE) ###"M" colour key corresponds to expected direction for acc/lat 
-lunaderivMlat<-multi_mgcvgam_growthrate_multiplot_rasteronly(df=LUNA[LUNA$sex=="M",],outcomevars = c("Latencycomposite"),idvar="id",predvars='Ageatvisit',mformula=lunaformula,datarangegrey=TRUE,derivrangemanual=c(-.2,.2),derivcolourmanual=c("#00BFC4","grey33"),devageguides=FALSE,zscale=FALSE) ###"M" colour key corresponds to expected direction for acc/lat 
+lunaderivMacc<-multi_mgcvgam_growthrate_multiplot_rasteronly(df=LUNA[LUNA$sex=="M",],outcomevars = c("Accuracycomposite"),idvar="id",predvars='Ageatvisit',mformula=lunaformula_m,datarangegrey=TRUE,derivrangemanual=c(-.2,.2),derivcolourmanual=c("grey33","#00BFC4"),devageguides=FALSE,zscale=FALSE) ###"M" colour key corresponds to expected direction for acc/lat 
+lunaderivMlat<-multi_mgcvgam_growthrate_multiplot_rasteronly(df=LUNA[LUNA$sex=="M",],outcomevars = c("Latencycomposite"),idvar="id",predvars='Ageatvisit',mformula=lunaformula_m,datarangegrey=TRUE,derivrangemanual=c(-.2,.2),derivcolourmanual=c("#00BFC4","grey33"),devageguides=FALSE,zscale=FALSE) ###"M" colour key corresponds to expected direction for acc/lat 
 
 lunascaledfitsF<-mgcvscalefits(LUNA[LUNA$sex=="F",],outcomevars = c("Accuracycomposite","Latencycomposite"),predvars = "Ageatvisit",idvar="id",mformula = lunaformula,scale=FALSE)
 lunascaledfitsF$sex<-"F"
@@ -179,4 +180,19 @@ ggsave(PNCall,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03
 
 #########all panels#########
 lunaallwithNCANDAall<-(gglunaalllatfitsacc+ggNCANDAalllatfitsacc)/(lunaderivFacc$returnplot+lunaderivFlat$returnplot+NCANDAderivFacc$returnplot+NCANDAderivFlat$returnplot)/(lunaderivMacc$returnplot+lunaderivMlat$returnplot+NCANDAderivMacc$returnplot+NCANDAderivMlat$returnplot)+patchwork::plot_layout(heights = c(3,1,1))
+#####
+
+###supporting data
+alllunafits$dataset<-"Luna"
+allNCANDAfits$dataset<-"NCANDA"
+allNKIfits$dataset<-"NKI"
+allPNCfits$dataset<-"PNC"
+
+outvars<-c("pred","fit","sex","se","outcomelabel","dataset")
+
+supdatafits<-rbind(alllunafits[,outvars],allNCANDAfits[,outvars]) %>% rbind(.,allNKIfits[,outvars]) %>%
+  rbind(.,allPNCfits[,outvars])
+
+write.csv(supdatafits,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Data/SupportingData/Sup13.csv")
+
 

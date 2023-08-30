@@ -97,6 +97,6 @@ gpefvarspattern<-LNCDR::lunaize(gpefvarspattern)+theme(legend.title = element_bl
   theme(axis.text.x = element_text(angle = 90,size=15))
 
 ####savelist######
-savelistout<-list(propbyage=propbyage,gpefvarspattern=gpefvarspattern,groupslong=groupslong)
+savelistout<-list(propbyage=propbyage,gpefvarspattern=gpefvarspattern,propbyagebyvar=propbyagebyvar,groupslong=groupslong)
 save(savelistout,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Figures/Agecomspec/NCANDAagecomspecalldata.Rdata")
 

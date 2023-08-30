@@ -253,7 +253,11 @@ bars<-allsaveplot$allloaings[[1]]+allsaveplot$allloaings[[2]]+allsaveplot$allloa
 
 fullfigurepanel<-ggplotallcors/allsaveplot$ggallvar/allsaveplot$ggallscreeforpanel+plot_layout(heights=c(2,1,.4))
   
-  
+
+alldatawithmean_r<-alldatawithmean[c("labelf","typepairf","cor")]
+write.csv(alldatawithmean_r,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Data/SupportingData/Figure3A.csv")
+
+
 #   plot_spacer()/bars
 # 
 # # 

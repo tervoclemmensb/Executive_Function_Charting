@@ -334,6 +334,10 @@ ggbasisallvarsmodcomparelat<-LNCDR::lunaize(ggbasisallvarsmodcomparelat)+ylab("A
 save(ggbasisallvarsmodcomparelat,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Figures/Metabasis/allmeasureslatboxplot.plot.Rdata")
 
 
+###supportdata###
+
+outofsamplebasismodelcompdf_r<-outofsamplebasismodelcompdf[,c("type","simpnamef","Performancescore","simpnamefbytypef")]
+write.csv(outofsamplebasismodelcompdf_r,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Data/SupportingData/Figure5B.csv")
 #######
 
 ####set up CP for pie charts
@@ -596,7 +600,7 @@ outofsamplebasismodelcompdfsummarysens_PR<-outofsamplebasismodelcompdf_sens %>% 
 
 outofsamplebasismodelcompdfsummarysens_PR1<-outofsamplebasismodelcompdfsummarysens_PR[outofsamplebasismodelcompdfsummarysens_PR$Performance_Scorerank==1,]
 
-outofsamplebasismodelcompdfsummarysens_PR1 %>% dplyr::group_by(simpnamefbytypef) %>% dplyr::summarize(mean=mean(prop))
+outofsamplebasismodelcompdfsummarysens_PR1 %>% dplyr::summarize(mean=mean(prop))
 
 
 

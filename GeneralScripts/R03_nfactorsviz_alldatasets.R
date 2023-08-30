@@ -21,7 +21,7 @@ Lunascreelongitudinal<-alleigssaves$screedatawithin
 Lunascreelongitudinal$type<-"within"
 Lunaallscree<-plyr::rbind.fill(Lunascreebaseline,Lunascreelongitudinal)
 Lunaallscree$dataset<-"Luna"
-
+Lunaeig<-alleigssaves$alleigs
 ###Variance
 Lunavarbaseline<-data.frame(alleigssaves$varaccount)
 Lunavarbaseline<-data.frame(t(Lunavarbaseline[row.names(Lunavarbaseline)=="Proportion Var",]))
@@ -50,6 +50,7 @@ NCANDAscreelongitudinal<-alleigssaves$screedatawithin
 NCANDAscreelongitudinal$type<-"within"
 NCANDAallscree<-plyr::rbind.fill(NCANDAscreebaseline,NCANDAscreelongitudinal)
 NCANDAallscree$dataset<-"NCANDA"
+NCANDAeig<-alleigssaves$alleigs
 
 NCANDAvarbaseline<-data.frame(alleigssaves$varaccount)
 NCANDAvarbaseline<-data.frame(t(NCANDAvarbaseline[row.names(NCANDAvarbaseline)=="Proportion Var",]))
@@ -75,6 +76,7 @@ NCANDAloadinglongitudinal$dataset<-"NCANDA\nlongitudinal"
 load(file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Figures/Factorfigs/allfactordataNKI.Rdata")
 NKIscree<-alleigssaves$screedata
 NKIscree$dataset<-"NKI"
+NKIeig<-alleigssaves$eigs
 
 NKIvar<-data.frame(alleigssaves$varaccount)
 NKIvar<-data.frame(t(NKIvar[row.names(NKIvar)=="Proportion Var",]))
@@ -88,6 +90,7 @@ NKIloading$dataset<-"NKI"
 load(file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Figures/Factorfigs/allfactordataPNC.Rdata")
 PNCscree<-alleigssaves$screedata
 PNCscree$dataset<-"PNC"
+PNCeig<-alleigssaves$eigs
 
 PNCvar<-data.frame(alleigssaves$varaccount)
 PNCvar<-data.frame(t(PNCvar[row.names(PNCvar)=="Proportion Var",]))
@@ -122,6 +125,10 @@ ggallscreeforpanel<-ggallscree
 
 require(patchwork)
 panelvarandscree<-ggallvar/ggallscreeforpanel+plot_layout(heights=c(1,.25))
+
+###save data###
+write.csv(allvar,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Data/SupportingData/Figure3BV.csv")
+wreite.csv(allscreebar[,c("vals","percentcumusumn")],file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Data/SupportingData/Figure3BT.csv")
 
 ####loadingsf or first facto########
 ####individual plot calls (i.e., not faceted) because facet wrapping will squish expand bars to fill same area...
@@ -166,76 +173,21 @@ allloaings<-allloadingplots[[1]]+allloadingplots[[2]]+allloadingplots[[3]]+alllo
 allfactorfigs<-ggallvar/ggallscreeforpanel/(allloadingplots[[1]]+allloadingplots[[2]]+allloadingplots[[3]]+allloadingplots[[4]]+allloadingplots[[5]]+allloadingplots[[6]]+plot_layout(ncol = 6))+plot_layout(heights=c(1.5,.25,1))
 allsaveplot<-list(ggallvar=ggallvar,ggallscreeforpanel=ggallscreeforpanel,allloaings=allloaings)
 save(allsaveplot,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Figures/Factorfigs/allfactormainfigs.Rdata")
-####commented out, switched to above loop function for plotting simplicity 
-# ggloadingluna<-ggplot(allloadingsfirstfac, aes(y=groupbytypef, x=1, fill=loadingflip)) + 
-#   geom_tile()+
-#   scale_fill_gradient2(name = "loading", 
-#                        high = "#c9270e", mid = "white", low = "#2f42bde6", 
-#                        midpoint=0, guide="none",
-#                        limits=c(-1,1)) +
-#   xlab("") + #improve y-axis label
-#   ylab("")+
-#   #facet_wrap(~dataset,scales="free")+
-#   facet_grid(.~dataset,scales="free_y")+
-#   #scale_y_discrete(limits = scalexdiscretelimits)+
-#   scale_x_discrete(expand = c(0,0))+
-#   geom_text(aes(label=loadinglabel),size=5)
-# ggloadingluna<-LNCDR::lunaize(ggloadingluna)+ylab("")+theme(axis.line.y = element_blank())+theme(axis.text.x=element_blank())
-# 
-# ###
-# NCANDAloading<-allloadingsfirstfac[allloadingsfirstfac$dataset=="NCANDA",]
-# NCANDAloading$groupbytypeff<-factor(NCANDAloading$groupbytypef)
-# scalexdiscretelimits=c(levels(factor(NCANDAloading$groupbytypef)),sprintf("Null%s",seq(12-length(levels(factor(NCANDAloading$groupbytypef))))))###adding nulls to ensure equal bar width across datasets
-# 
-# ggloadingNCANDA<-ggplot(NCANDAloading, aes(y=groupbytypeff, x=1, fill=loadingflip)) + 
-#   geom_tile()+
-#   scale_fill_gradient2(name = "loading", 
-#                        high = "#c9270e", mid = "white", low = "#2f42bde6", 
-#                        midpoint=0, guide="none",
-#                        limits=c(-1,1)) +
-#   xlab("") + #improve y-axis label
-#   ylab("")+
-#   #facet_wrap(~dataset,scales="free")+
-#   scale_y_discrete(limits = scalexdiscretelimits)+
-#   scale_x_discrete(expand = c(0,0))+
-#   geom_text(aes(label=loadinglabel),size=5)
-# ggloadingNCANDA<-LNCDR::lunaize(ggloadingNCANDA)+ylab("")+theme(axis.line.y = element_blank())+theme(axis.text.x=element_blank())
-# 
-# ####
-# 
-# 
-# ggloadingNKI<-ggplot(NKIloading, aes(y=groupbytypef, x=1, fill=loadingflip)) + 
-#   geom_tile()+
-#   scale_fill_gradient2(name = "loading", 
-#                        high = "#c9270e", mid = "white", low = "#2f42bde6", 
-#                        midpoint=0, guide="none",
-#                        limits=c(-1,1)) +
-#   xlab("") + #improve y-axis label
-#   ylab("")+
-#   #facet_wrap(~dataset,scales="free")+
-#   scale_y_discrete(limits = scalexdiscretelimits)+
-#   scale_x_discrete(expand = c(0,0))+
-#   geom_text(aes(label=loadinglabel),size=5)
-# ggloadingNKI<-LNCDR::lunaize(ggloadingNKI)+ylab("")+theme(axis.line.y = element_blank())+theme(axis.text.x=element_blank())
-# 
-# ####
-# 
-# PNCloading<-allloadingsfirstfac[allloadingsfirstfac$dataset=="PNC",]
-# PNCloading$typebygroup<-paste(PNCloading$type,PNCloading$group,sep="_") ###type first for ordering in plot
-# PNCloading$groupbytypef<-factor(PNCloading$groupbytype,levels=rev(unique(PNCloading$groupbytype[order(PNCloading$typebygroup)])))
-# scalexdiscretelimits=c(levels(factor(PNCloading$groupbytypef)),sprintf("Null%s",seq(12-length(levels(factor(PNCloading$groupbytypef))))))###adding nulls to ensure equal bar width across datasets
-# 
-# ggloadingPNC<-ggplot(PNCloading, aes(y=groupbytypef, x=1, fill=loadingflip)) + 
-#   geom_tile()+
-#   scale_fill_gradient2(name = "loading", 
-#                        high = "#c9270e", mid = "white", low = "#2f42bde6", 
-#                        midpoint=0, guide="none",
-#                        limits=c(-1,1)) +
-#   xlab("") + #improve y-axis label
-#   ylab("")+
-#   #facet_wrap(~dataset,scales="free")+
-#   scale_y_discrete(limits = scalexdiscretelimits)+
-#   scale_x_discrete(expand = c(0,0))+
-#   geom_text(aes(label=loadinglabel),size=5)
-# ggloadingPNC<-LNCDR::lunaize(ggloadingPNC)+ylab("")+theme(axis.line.y = element_blank())+theme(axis.text.x=element_blank())
-# 
+
+######individual datasets supporting data#####
+##eigs##
+Lunaeig$dataset<-"Luna"
+NCANDAeig$dataset<-"NCANDA"
+NKIeig$dataset<-"NKI"
+PNCeig$dataset<-"PNC"
+
+alleigs<-plyr::rbind.fill(Lunaeig,NCANDAeig) %>% plyr::rbind.fill(.,NKIeig) %>%
+  plyr::rbind.fill(.,PNCeig)
+
+alleigs<-alleigs[,c("index","eigvals","resamp","within.eigvals","within.resamp","dataset")]
+write.csv(alleigs,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Data/SupportingData/Sup7E.csv")
+###loadings####
+allloadings_r<-allloadings[,c("groupbytype","loadinglabel","dataset")]
+write.csv(allloadings_r,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Data/SupportingData/Sup7L.csv")
+
+

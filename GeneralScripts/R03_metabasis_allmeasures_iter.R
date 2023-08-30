@@ -3,6 +3,7 @@ library(tidyr)
 library(ggplot2)
 library(mgcv)
 library(parallel)
+library(lme4)
 ###
 source("~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/GeneralScripts/growthrate_mgcvgam.R")
 source("~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/GeneralScripts/metabyage.R")
@@ -319,7 +320,10 @@ ggbasisallvaroffsetcompare<-ggplot(outofsamplebasismodelcompdf[outofsamplebasism
   geom_smooth(method = "gam",formula=y~s(x,k=6),se=FALSE, aes(group=1,colour=typefull),size=2)+scale_colour_manual(values=c("#c9270e","#2f42bde6"))
 ggbasisallvaroffsetcompare<-LNCDR::lunaize(ggbasisallvaroffsetcompare)+ylab("Age Basis Model Performance Score\n (Percentile Among Models)")+xlab("Age Basis Offset (years)")+theme(legend.position = "none",strip.background = element_blank(),strip.text.x = (element_text(size = 20)))
 
+###supporting data
 
+offsetboxplot_s_r<-outofsamplebasismodelcompdf[outofsamplebasismodelcompdf$simpnamef=="basis",c("ageoffset","Performancescore","typefull")]
+write.csv(offsetboxplot_s_r,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Data/SupportingData/Sup12B.csv")
 
 metafitwithoutdismoothoffsets<-lapply(ageoffsets,function(offsetforvis){
   print(offsetforvis)
@@ -340,7 +344,7 @@ metafitwithoutdismoothoffsets<-lapply(ageoffsets,function(offsetforvis){
   offsetvistempacc$offset<-offsetforvis
   return(offsetvistempacc)
 })
-accmetafitwithoutdismoothoffsetsdf<-do.call(rbind,accmetafitwithoutdismoothoffsets)
+accmetafitwithoutdismoothoffsetsdf<-do.call(rbind,metafitwithoutdismoothoffsets)
 ggofsetviz<-ggplot(accmetafitwithoutdismoothoffsetsdf,aes(x=pred,y=offsetestimate,colour=as.factor(offset/10)))+geom_point()+scale_colour_brewer(palette = "Reds")
 ggofsetviz<-LNCDR::lunaize(ggofsetviz)+labs(col=guide_legend(title="Basis Offset\n(years)"))+theme(legend.title =element_text(size=15),legend.position = c(0.8, 0.39))+ylab("Basis Value (A.U.)")+xlab("Age (years)")
 metafitwithoutdismoothoffsetslatency<-lapply(ageoffsets,function(offsetforvis){
@@ -365,3 +369,15 @@ metafitwithoutdismoothoffsetslatency<-lapply(ageoffsets,function(offsetforvis){
 latmetafitwithoutdismoothoffsetsdf<-do.call(rbind,metafitwithoutdismoothoffsetslatency)
 ggofsetvizlat<-ggplot(latmetafitwithoutdismoothoffsetsdf,aes(x=pred,y=offsetestimate,colour=as.factor(offset/10)))+geom_point()+scale_colour_brewer(palette = "Blues")
 ggofsetvizlat<-LNCDR::lunaize(ggofsetvizlat)+labs(col=guide_legend(title="Basis Offset\n(years)"))+theme(legend.title =element_text(size=15),legend.position = c(0.8, .60))+ylab("Basis Value (A.U.)")+xlab("Age (years)")
+
+
+accmetafitwithoutdismoothoffsetsdf_r<-accmetafitwithoutdismoothoffsetsdf[,c("pred","offsetestimate","offset")]
+accmetafitwithoutdismoothoffsetsdf_r$type<-"Accuracy"
+
+latmetafitwithoutdismoothoffsetsdf_r<-latmetafitwithoutdismoothoffsetsdf[,c("pred","offsetestimate","offset")]
+latmetafitwithoutdismoothoffsetsdf_r$type<-"Latency"
+
+
+alloffsetvis<-rbind(accmetafitwithoutdismoothoffsetsdf_r,latmetafitwithoutdismoothoffsetsdf_r)
+write.csv(alloffsetvis,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Data/SupportingData/Sup12A.csv")
+

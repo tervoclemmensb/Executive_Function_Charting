@@ -104,9 +104,10 @@ mgcvgampreddata<-function(model,predvar,idvar=NULL,interval_inc=.1,varycovarsnam
     for (cv in find_covars_gam(model$formula,predvar)){
       x <- model$model[, cv]
       if (is.character(x) || is.factor(x)){
-        warning("gam w/factor covar, setting all sim to the first!")
+        warning("gam w/character or factor covar, setting all sim to the first obs for character/first level if factor")
         y <- x[1]
-        # TODO: maybe pracma::Mode ?
+        if (class(x)=="factor"){y<-levels(x)[1]}
+        print(sprintf("covar % set to level %s",cv,y))
       } else {
         y <- mean(x, na.rm=T)
       }

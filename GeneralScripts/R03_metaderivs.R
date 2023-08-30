@@ -3,6 +3,7 @@ library(ggplot2)
 library(scales)
 library(dplyr)
 library(metafor)
+library(tidyr)
 source("~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/GeneralScripts/growthrate_mgcvgam.R")
 #########all deriv data####
 ##read#######
@@ -48,6 +49,30 @@ allderivdataacc<-data.frame(allderivdataacc %>% group_by(dataset,var) %>% mutate
 
 allderivdataacc$varbydataset<-paste(allderivdataacc$var,allderivdataacc$dataset)
 allderivdatalat$varbydataset<-paste(allderivdatalat$var,allderivdatalat$dataset)
+
+####visualize all mat points#######
+matpointsacc<-allderivdataacc %>% group_by(varbydataset) %>% summarize(matpoint=unique(matpoint))
+matpointslat<-allderivdatalat %>% group_by(varbydataset) %>% summarize(matpoint=unique(matpoint))
+
+gghistmatacc<-ggplot(matpointsacc,aes(x=matpoint))+geom_histogram(bins=30,colour="black",fill="#c9270e",alpha=.99)+scale_y_continuous(expand=c(0,0))+
+  geom_vline(xintercept = median(matpointsacc$matpoint,na.rm=TRUE),linetype="dashed",colour="grey40",size=1.25)+
+  scale_x_continuous(limits = c(8,36),breaks=(c(10,15,20,25,30,35)))
+gghistmatacc<-LNCDR::lunaize(gghistmatacc)+xlab("Final Age of Significance (years)")+ylab("Count (# of EF Measures)")+ggtitle("Accuracy\n")+
+  theme(plot.title = element_text(size=24,hjust = 0.5))
+
+gghistmatlat<-ggplot(matpointslat,aes(x=matpoint))+geom_histogram(bins=30,colour="black",fill="#253494",alpha=.99)+scale_y_continuous(expand=c(0,0))+
+  geom_vline(xintercept = median(matpointslat$matpoint,na.rm=TRUE),linetype="dashed",colour="grey40",size=1.25)+
+  scale_x_continuous(limits = c(8,36),breaks=(c(10,15,20,25,30,35)))
+gghistmatlat<-LNCDR::lunaize(gghistmatlat)+xlab("Final Age of Significance (years)")+ylab("Count (# of EF Measures)")+ggtitle("Latency\n")+
+  theme(plot.title = element_text(size=24,hjust = 0.5))
+
+library(patchwork)
+allhists<-(gghistmatacc)+(gghistmatlat)
+ggsave(allhists,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Figures/MatRasters/finalsignificantderivage.pdf",height=5,width=9)
+matpointsacc$type<-"acc"
+matpointslat$type<-"lat"
+allmatpoints<-rbind(matpointsacc,matpointslat)
+write.csv(allmatpoints,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Data/SupportingData/Sup4.csv")
 
 ####aggregate bars for all measures####
 ###################################
@@ -108,6 +133,7 @@ metabyageacc<-lapply(unique(agegrid$ages),function(ai){
 })
 metabyageaccdf<-do.call(plyr::rbind.fill,metabyageacc)
 metabyageaccdf$estimate[metabyageaccdf$age >=10 & metabyageaccdf$age <=15]
+metabyageaccdf$estimate[metabyageaccdf$age >=10 & metabyageaccdf$age <=12]
 metabyageaccdf$estimate[metabyageaccdf$age >=10 & metabyageaccdf$age <=12]
 metabyageaccdf$estimate[metabyageaccdf$age >=18 & metabyageaccdf$age <=20]
 metabyageaccdf$estimateclip<-metabyageaccdf$estimate
@@ -216,10 +242,152 @@ save(finalggmetamatlat,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Pro
 save(tilemetalatlegend,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Figures/MatRasters/metalatmatrasters.legend.Rdata")
 
 
-###################################
+###################################supplemental all derivs unthresholded#####
+##set up names###
+lunagroups<-data.frame(acc=c("Accuracycomposite","Anti_CRR","Mix_CRR","DMS.PC","SSP.Span.length","nfixbreak_fl","SOC.Problems.solved.in.minimum.moves","best_acc_m_exclude_fl"),
+                   lat=c("Latencycomposite","Anti_CRLat","Mix_CRLat","DMS.Median.correct.latency",NA,NA,"SOC.Overallmeaninitialthinkingtime","first_lat_m_exclude"),
+                   group=c("COMP","ANTI","MIX","DMS","SSP","FIX","SOC","MGS"))
+lunagroupslong<-gather(lunagroups, type, var, acc:lat, factor_key=TRUE)
+lunagroupslong$dataset<-"Luna"
+
+NCANDAgroups<-data.frame(acc=c("Accuracycomposite","cnp_pcet_pcet_acc2","cnp_spcptnl_scpt_tp","cnp_sfnb2_sfnb_mcr",NA),
+                   lat=c("Latencycomposite","cnp_pcet_pcetrtcr","cnp_spcptnl_scpt_tprt","cnp_sfnb2_sfnb_mrtc","stroop_total_mean"),
+                   group=c("COMP","PCET","PCTP","PNBK","STRP"))
+NCANDAgroupslong<-gather(NCANDAgroups, type, var, acc:lat, factor_key=TRUE)
+NCANDAgroupslong$dataset<-"NCANDA"
+
+NKIgroups<-data.frame(acc=c("Accuracycomposite","PCET_PCET_ACC2","SPCPTNL_SCPT_TP","SLNB2_SLNB_MCR","TOWacc","DFLacc",NA,NA),
+                   lat=c("Latencycomposite","PCET_PCETRTCR","SPCPTNL_SCPT_TPRT","SLNB2_SLNB_MRTC",NA,NA,"CWIlat","TMTlat"),
+                   group=c("COMP","PCET","PCTP","PNBK","TOW","DFL","CWI","TMT"))
+NKIgroupslong<-gather(NKIgroups, type, var, acc:lat, factor_key=TRUE)
+NKIgroupslong$dataset<-"NKI"
+
+PNCgroups<-data.frame(acc=c("Accuracycomposite","PCET_ACC2","PCPT_T_TP","LNB_MCR"),
+                   lat=c("Latencycomposite","PCET_RTCR","PCPT_T_TPRT","LNB_MRTC"),
+                   group=c("COMP","PCET","PCTP","PNBK"))
+PNCgroupslong<-gather(PNCgroups, type, var, acc:lat, factor_key=TRUE)
+PNCgroupslong$dataset<-"PNC"
+
+####all labels#####
+allabels<-plyr::rbind.fill(lunagroupslong,NCANDAgroupslong) %>% plyr::rbind.fill(.,NKIgroupslong) %>% plyr::rbind.fill(.,PNCgroupslong)
+
+###accuracy
+allderivdataaccwithlabels<-merge(allderivdataacc,allabels,by=c("dataset","var"))
+allderivdataaccwithlabels$groupf<-factor(allderivdataaccwithlabels$group)
+allderivdataaccwithlabels$groupf<-factor(allderivdataaccwithlabels$group,levels=c("COMP",levels(allderivdataaccwithlabels$groupf)[levels(allderivdataaccwithlabels$groupf)!="COMP"]))
+
+allderivdataaccwithlabels$mean_dff_clip_bin<-dplyr::if_else(allderivdataaccwithlabels$mean_dff_clip!=0,1,0)
+allderivdataaccwithlabels_diffcliponly<-allderivdataaccwithlabels[allderivdataaccwithlabels$mean_dff_clip_bin==1,]
+allderivdataaccwithlabels_diffcliponly$mean_dff_clip_sign<-sign(allderivdataaccwithlabels_diffcliponly$mean_dff_clip)
+##latency 
+allderivdatalatwithlabels<-merge(allderivdatalat,allabels,by=c("dataset","var"))
+allderivdatalatwithlabels$groupf<-factor(allderivdatalatwithlabels$group)
+allderivdatalatwithlabels$groupf<-factor(allderivdatalatwithlabels$group,levels=c("COMP",levels(allderivdatalatwithlabels$groupf)[levels(allderivdatalatwithlabels$groupf)!="COMP"]))
+
+allderivdatalatwithlabels$mean_dff_clip_bin<-dplyr::if_else(allderivdatalatwithlabels$mean_dff_clip!=0,1,0)
+allderivdatalatwithlabels_diffcliponly<-allderivdatalatwithlabels[allderivdatalatwithlabels$mean_dff_clip_bin==1,]
+allderivdatalatwithlabels_diffcliponly$mean_dff_clip_sign<-sign(allderivdatalatwithlabels_diffcliponly$mean_dff_clip)
+
+########plots#######
+##acc
+ggallderivCIacc<-ggplot(allderivdataaccwithlabels,aes(x=ages,y=mean_dff))+geom_line(size=.5)+
+  geom_ribbon(aes(x=ages,ymin=ci_low,ymax=ci_high),fill="grey55",colour="grey55",alpha=.2)+
+  geom_ribbon(data=allderivdataaccwithlabels_diffcliponly,aes(x=ages,ymin=ci_low,ymax=ci_high,fill=as.factor(mean_dff_clip_sign),colour=as.factor(mean_dff_clip_sign)),alpha=.2)+
+  geom_line(data=allderivdataaccwithlabels_diffcliponly,aes(x=ages,y=mean_dff,colour=as.factor(mean_dff_clip_sign)))+
+  scale_colour_manual(values=c("#c9270e","grey80"))+
+  scale_x_continuous(limits = c(8, 36),breaks=(c(10,15,20,25,30,35)))+
+  geom_hline(yintercept = 0,linetype="dashed")+
+  #facet_grid(cols=vars(groupf),rows=vars(dataset),scales="free",space="free")+
+  facet_wrap(~dataset*groupf,scales = "free")+
+  theme(legend.position = "none")
+
+ggallderivCIacc<-LNCDR::lunaize(ggallderivCIacc)+xlab("Age (years)")+ylab("First Derivative of Age Trajectory\n (z-score)")+theme(legend.position = "none",legend.title = element_blank())+
+  theme(axis.text.x = element_text(size=12),axis.text.y = element_text(size=12),strip.text.x=element_text(size=10))+ggtitle("Accuracy\n")+
+  theme(plot.title = element_text(hjust = 0.5,size=24))
+
+ggsave(ggallderivCIacc,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Figures/MatRasters/derivfullCI.acc.pdf",height=9,width=10)
+
+###lat
+
+ggallderivCIlat<-ggplot(allderivdatalatwithlabels,aes(x=ages,y=mean_dff))+geom_line(size=.5)+
+  geom_ribbon(aes(x=ages,ymin=ci_low,ymax=ci_high),fill="grey55",colour="grey55",alpha=.2)+
+  geom_ribbon(data=allderivdatalatwithlabels_diffcliponly,aes(x=ages,ymin=ci_low,ymax=ci_high,fill=as.factor(mean_dff_clip_sign),colour=as.factor(mean_dff_clip_sign)),alpha=.2)+
+  geom_line(data=allderivdatalatwithlabels_diffcliponly,aes(x=ages,y=mean_dff,colour=as.factor(mean_dff_clip_sign)))+
+  scale_colour_manual(values=c("#2f42bde6","#c9270e"))+
+  scale_fill_manual(values=c("#2f42bde6","#c9270e"))+
+  scale_x_continuous(limits = c(8, 36),breaks=(c(10,15,20,25,30,35)))+
+  geom_hline(yintercept = 0,linetype="dashed")+
+  #facet_grid(cols=vars(groupf),rows=vars(dataset),scales="free",space="free")+
+  facet_wrap(~dataset*groupf,scales = "free")+
+  theme(legend.position = "none")
+
+ggallderivCIlat<-LNCDR::lunaize(ggallderivCIlat)+xlab("Age (years)")+ylab("First Derivative of Age Trajectory\n (z-score)")+theme(legend.position = "none",legend.title = element_blank())+
+  theme(axis.text.x = element_text(size=12),axis.text.y = element_text(size=12),strip.text.x=element_text(size=10))+ggtitle("Latency\n")+
+  theme(plot.title = element_text(hjust = 0.5,size=24))
+
+ggsave(ggallderivCIlat,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Figures/MatRasters/derivfullCI.lat.pdf",height=9,width=10)
+
+accandlatderivCI<-ggallderivCIacc/ggallderivCIlat
+
+ggsave(accandlatderivCI,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Figures/MatRasters/derivfullCI.pdf",height=18,width=10)
+
+########
+allderivCI<-plyr::rbind.fill(allderivdatalatwithlabels[,c("ages","type","dataset","groupf","mean_dff","ci_low","ci_high","mean_dff_clip","mean_dff_clip_bin")],
+                             allderivdataaccwithlabels[,c("ages","type","dataset","groupf","mean_dff","ci_low","ci_high","mean_dff_clip","mean_dff_clip_bin")])
+
+write.csv(allderivCI,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Data/SupportingData/Sup3.csv")
+
+####allderivfullpanel
+allderiv_individs<-plyr::rbind.fill(allderivdatalatwithlabels[,c("ages","type","dataset","groupf","mean_dff_clip")],
+                             allderivdataaccwithlabels[,c("ages","type","dataset","groupf","mean_dff_clip")])
+
+metabyagelatdfnona$type<-"lat"
+metabyagelatdfnona$dataset<-"meta"
+metabyagelatdfnona$groupf<-"meta"
+
+metabyageaccdf$type<-"acc"
+metabyageaccdf$dataset<-"meta"
+metabyageaccdf$groupf<-"meta"
 
 
+allderivmetas<-plyr::rbind.fill(metabyagelatdfnona[,c("age","type","dataset","groupf","estimateclip")],
+                                metabyageaccdf[,c("age","type","dataset","groupf","estimateclip")])
 
+names(allderivmetas)[names(allderivmetas)=="age"]<-"ages"
+names(allderivmetas)[names(allderivmetas)=="estimateclip"]<-"mean_dff_clip"
+
+allderiv_fullpanel<-plyr::rbind.fill(allderivmetas,allderiv_individs)
+write.csv(allderiv_fullpanel,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Data/SupportingData/Figure2.csv")
+
+# #########
+# 
+# 
+# gderivpercentfit<-ggplot(allfitsacc,aes(x=pred,y=fitscale,colour=varbydataset))+geom_line(size=.5,alpha=.35)+
+#   theme(legend.position = "none")+
+#   geom_line(data=accmetafitsigsmooth,aes(x=pred,y=fit),colour="black",size=2)+
+#   scale_x_continuous(limits = c(8, 36),breaks=(c(10,15,20,25,30,35)))+
+#   scale_colour_manual(values=c("black","black",rep("black",length(unique(allfitsacc$varbydataset)))))+
+#   scale_linetype_manual(values=c("solid"))
+# ggderivpercentfit<-LNCDR::lunaize(ggderivpercentfit)+xlab("Age (years)")+ylab("% of Total")+theme(legend.position = "none",legend.title = element_blank())+
+#   theme(strip.text.y= element_text(angle = 360))
+# 
+# ggsave(ggderivpercentfit,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Figures/MatRasters/percentchangesigacc.fit.plot.pdf",height=4,width=6)
+# 
+# 
+# allfitslat<-allfits[allfits$outcome %in% unique(allinterpolatedfitssig$outcome) & allfits$type=="lat",]
+# 
+# latmetafitsigsmooth<-mgcvscalefits(latmetafitsig,outcomevars = c("percentmax"),predvars = "age",mformula = as.formula("outcome~s(pred)"),scale=FALSE,interval_inc = .1) ###fit smooth
+# 
+# ggderivpercentfit<-ggplot(allfitslat,aes(x=pred,y=fitscale,colour=varbydataset))+geom_line(size=.5,alpha=.35)+
+#   theme(legend.position = "none")+
+#   geom_line(data=latmetafitsigsmooth,aes(x=pred,y=fit),colour="black",size=2)+
+#   scale_x_continuous(limits = c(8, 36),breaks=(c(10,15,20,25,30,35)))+
+#   scale_colour_manual(values=c("black","black",rep("black",length(unique(allfitslat$varbydataset)))))+
+#   scale_linetype_manual(values=c("solid"))
+# ggderivpercentfit<-LNCDR::lunaize(ggderivpercentfit)+xlab("Age (years)")+ylab("% of Total")+theme(legend.position = "none",legend.title = element_blank())+
+#   theme(strip.text.y= element_text(angle = 360))
+# 
+# ggsave(ggderivpercentfit,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Figures/MatRasters/percentchangesiglat.fit.plot.pdf",height=4,width=6)
 
 
 

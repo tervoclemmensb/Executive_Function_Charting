@@ -17,6 +17,8 @@ library(gamm4)
 source("~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/GeneralScripts/outliers_mgcvgam.R")
 ############
 PNCdata<-read.csv("~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/PNC/Data/btc_PNCscoredmeasures_20220214.csv")
+load(file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/PNC/Data/PNCRaceSexinfo.Rdata")
+PNCdatawithdemo<-merge(PNCdata,allpheno_r,method="dbGaP_Subject_ID")
 ####vars############
 ####################
 allcogtestsacc<-c("PADT_A","PFMT_IFAC_TOT","PEIT_CR","PWMT_KIWRD_TOT","PVRT_CR","PEDT_A","PMAT_CR","VOLT_SVT","LNB_MCR","PCET_ACC2","PCPT_T_TP","PLOT_TC","WRAT_CR_RAW")
@@ -45,7 +47,10 @@ coglongmdcensor$mvout<-0
 coglongmdcensor$mvout[mvouts>4]<-1
 coglongmdcensor<-coglongmdcensor[coglongmdcensor$mvout==0,]
 coglongmdcensornoallna<-coglongmdcensor[rowSums(is.na(coglongmdcensor[,allefvars])) != ncol(coglongmdcensor[,allefvars]), ]
-####8508 subjects
+
+coglongmdcensornoallnawithdem<-merge(coglongmdcensornoallna,allpheno_r,by="dbGaP_Subject_ID")
+
+####9151 subjects
 ##########write data########
 write.csv(coglongmdcensornoallna,"~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/PNC/Data/btc_PNCscoredmeasures_20220214.outlierremoved.csv")
 

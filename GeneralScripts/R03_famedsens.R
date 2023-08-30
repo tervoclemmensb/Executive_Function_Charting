@@ -41,6 +41,17 @@ LunaeduniquefromLunacog<-Lunaedunique[Lunaedunique$id %in% LUNA$id,]
 LunaeduniquefromLunacognona<-data.frame(LunaeduniquefromLunacog[rowSums(is.na(LunaeduniquefromLunacog[,c("maternaled","paternaled")])) != ncol(LunaeduniquefromLunacog[,c("maternaled","paternaled")]), ])
 LunaeduniquefromLunacognona$parentedaverage<-compositecols(c("maternaled","paternaled"),data=LunaeduniquefromLunacognona,mincols=1)##composite but allow for only one parental score
 LUNA<-merge(LUNA,LunaeduniquefromLunacognona,by=c("id"),all.x=TRUE)
+####for table#####
+LUNAtable<-LUNA[LUNA$visitnum==1,]
+LUNAtable$guardedfact<-NA
+LUNAtable$guardedfact[LUNAtable$maternaled %in% c(3,2,1)]<-"Incomplete Highschool"
+LUNAtable$guardedfact[LUNAtable$maternaled %in% c(4)]<-"Highschool"
+LUNAtable$guardedfact[LUNAtable$maternaled %in% c(5)]<-"Some College"
+LUNAtable$guardedfact[LUNAtable$maternaled %in% c(6)]<-"College"
+LUNAtable$guardedfact[LUNAtable$maternaled %in% c(7)]<-"Postgraduate"
+LUNAtable$guardedfact<-factor(LUNAtable$guardedfact,levels=c("Incomplete Highschool","Highschool","Some College","College","Postgraduate"))
+table(LUNAtable$guardedfact)/nrow(LUNAtable)
+prop.table(table(LUNAtable$guardedfact))
 ####
 NCANDA<-read.csv("~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/NCANDA/data/btc_R03cleaneddata_20220306.outlierremoved.compositeacclat.2030scale.csv")
 NCANDA$id<-as.factor(NCANDA$subject)
@@ -51,6 +62,17 @@ NCANDAparentreport<-read.csv("~/Library/Mobile\ Documents/com~apple~CloudDocs/Pr
 NCANDAparentreport<-NCANDAparentreport[NCANDAparentreport$visit=="baseline",]
 NCANDAparentreport$parentedaverage<-compositecols(c("parentreport_sesp3","parentreport_sesp3b"),data=NCANDAparentreport,mincols=1)##composite but allow for only one parental score
 NCANDA<-merge(NCANDA,NCANDAparentreport[,c("subject","parentreport_sesp3","parentreport_sesp3b","parentedaverage")],by=("subject"),all.x=TRUE)
+#####
+NCANDAtable<-NCANDA[NCANDA$visitnum==1,]
+NCANDAtable$guardedfact<-NA
+NCANDAtable$guardedfact[NCANDAtable$parentreport_sesp3 < 12 ]<-"Incomplete Highschool"
+NCANDAtable$guardedfact[NCANDAtable$parentreport_sesp3==12]<-"Highschool"
+NCANDAtable$guardedfact[NCANDAtable$parentreport_sesp3> 12 & NCANDAtable$parentreport_sesp3 < 16]<-"Some College"
+NCANDAtable$guardedfact[NCANDAtable$parentreport_sesp3==16]<-"College"
+NCANDAtable$guardedfact[NCANDAtable$parentreport_sesp3>16]<-"Postgraduate"
+NCANDAtable$guardedfact<-factor(NCANDAtable$guardedfact,levels=c("Incomplete Highschool","Highschool","Some College","College","Postgraduate"))
+table(NCANDAtable$guardedfact)/nrow(NCANDAtable)
+prop.table(table(NCANDAtable$guardedfact))
 ####
 NKI<-read.csv("~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/NKI/Data/btc_NKIscoredmeasures_20220306.outlierremoved.compositeacclat.2030scale.csv")
 NKI$id<-as.factor(NKI$subject)
@@ -79,6 +101,17 @@ allNKIedsum <-allNKIed %>% group_by(subject) %>% summarize(maternaled_guard1=mea
 allNKIedsum$parentedaverage<-compositecols(c("maternaled_guard1","maternaled_guard1"),data=allNKIedsum,mincols=1)##composite but allow for only one parental score
 
 NKI<-merge(NKI,allNKIedsum,by=c("subject"),all.x=TRUE)
+######
+#####
+NKI$guardedfact<-NA
+NKI$guardedfact[NKI$maternaled_guard1 < 12 ]<-"Incomplete Highschool"
+NKI$guardedfact[NKI$maternaled_guard1==12]<-"Highschool"
+NKI$guardedfact[NKI$maternaled_guard1> 12 & NKI$maternaled_guard1 < 16]<-"Some College"
+NKI$guardedfact[NKI$maternaled_guard1==16]<-"College"
+NKI$guardedfact[NKI$maternaled_guard1>16]<-"Postgraduate"
+NKI$guardedfact<-factor(NKI$guardedfact,levels=c("Incomplete Highschool","Highschool","Some College","College","Postgraduate"))
+table(NKI$guardedfact)/nrow(NKI)
+prop.table(table(NKI$guardedfact))
 ####
 PNC<-read.csv("~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/PNC/Data/btc_R03cleaneddata_20220306.outlierremoved.compositeacclat.2030scale.csv")
 PNC$id<-as.factor(PNC$dbGaP_Subject_ID)
@@ -93,6 +126,17 @@ PNCedsum <-PNCed %>% group_by(id) %>% summarize(Mother_Education=mean(Mother_Edu
 
 PNCedsum$parentedaverage<-compositecols(c("Mother_Education","Father_Education"),data=PNCedsum,mincols=1)
 PNC<-merge(PNC,PNCedsum,by=c("id"),all.x=TRUE)
+
+####
+PNC$guardedfact<-NA
+PNC$guardedfact[PNC$Mother_Education < 12 ]<-"Incomplete Highschool"
+PNC$guardedfact[PNC$Mother_Education==12]<-"Highschool"
+PNC$guardedfact[PNC$Mother_Education> 12 & PNC$Mother_Education < 16]<-"Some College"
+PNC$guardedfact[PNC$Mother_Education==16]<-"College"
+PNC$guardedfact[PNC$Mother_Education>16]<-"Postgraduate"
+PNC$guardedfact<-factor(PNC$guardedfact,levels=c("Incomplete Highschool","Highschool","Some College","College","Postgraduate"))
+table(PNC$guardedfact)/nrow(PNC)
+t(prop.table(table(PNC$guardedfact)))
 ####################
 ###note all internal scaling set to false due want to keep on original, full sample z units of composite metrics
 ###without internal scaling derivative plots will revert to T-scaling; saturating this scale here such that significant always shows same colour to minimize plotting complexity (i.e., is significant basemodel, is significant covmodel )
@@ -199,3 +243,17 @@ PNCall<-(ggPNCalllatfitsacc)/(PNCscaledfitbaseacc$returnplot+PNCscaledfitbaseacc
 ggsave(PNCall,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Figures/Sensplots/PNCedsens.pdf",height=6,width=8)
 #########all panels#########
 
+alllunafits$dataset<-"Luna"
+allNCANDAfits$dataset<-"NCANDA"
+allNKIfits$dataset<-"NKI"
+allPNCfits$dataset<-"PNC"
+
+outvars<-c("pred","fit","modeltype","se","outcomelabel","dataset")
+
+supdatafits<-rbind(alllunafits[,outvars],allNCANDAfits[,outvars]) %>% rbind(.,allNKIfits[,outvars]) %>% rbind(.,allPNCfits[,outvars])
+
+write.csv(supdatafits,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Data/SupportingData/Sup14.famed.csv")
+
+ggplot(supdatafits,aes(x=pred,y=fit,colour=modeltype))+geom_line()+
+  geom_ribbon(aes(ymin=fit-2*se,ymax=fit+2*se,fill=modeltype),colour="black",alpha=.5)+
+  facet_grid(rows=vars(dataset),cols=vars(outcomelabel))

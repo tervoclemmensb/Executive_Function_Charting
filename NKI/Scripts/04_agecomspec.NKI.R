@@ -143,7 +143,7 @@ gpefvarspatternsens<-LNCDR::lunaize(gpefvarspatternsens)+theme(legend.title = el
 
 ####savelist######
 
-savelistout<-list(propbyage=propbyage,propbyagesens=propbyagesens,gpefvarspattern=gpefvarspattern,gpefvarspatternsens=gpefvarspatternsens,groupslong=groupslong)
+savelistout<-list(propbyage=propbyage,propbyagesens=propbyagesens,propbyagebyvar=propbyagebyvar,gpefvarspattern=gpefvarspattern,gpefvarspatternsens=gpefvarspatternsens,groupslong=groupslong)
 save(savelistout,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Figures/Agecomspec/NKIagecomspecalldata.Rdata")
 
 

@@ -189,7 +189,7 @@ ggsave(fullpanelwithbotheigs,file="~/Library/Mobile\ Documents/com~apple~CloudDo
 cors<-cor(coglongdata_baseline[,allefvars],use="pairwise.complete.obs")
 source("~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/GeneralScripts/corsave.R")
 corssaveclean<-corsaveclean(cors,groupslong)
-write.table(lowermerge,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Figures/Factorfigs/Lunabaselinecorrs.csv",row.names=FALSE,col.names=FALSE,sep=",",quote=FALSE)
+write.table(corssaveclean,file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/Figures/Factorfigs/Lunabaselinecorrs.csv",row.names=FALSE,col.names=FALSE,sep=",",quote=FALSE)
 
 corslong<-cors %>% rstatix::cor_gather()
 corslong<-corslong[corslong$var1!=corslong$var2,] ### remove identity 

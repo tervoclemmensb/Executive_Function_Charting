@@ -15,9 +15,12 @@ library(corrplot)
 library(mgcv)
 #####0X PNC cognitive data#######
 #########CNP##########
-allpheno<-read.table("~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/PNC/Data/decrypt/phs000607.v3.pht003445.v3.p2.c1.Neurodevelopmental_Genomics_Subject_Phenotypes.GRU-NPU.txt",header=TRUE,fill=TRUE)
+allpheno<-read.table("~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/PNC/Data/decrypt/phs000607.v3.pht003445.v3.p2.c1.Neurodevelopmental_Genomics_Subject_Phenotypes.GRU-NPU.txt",header=TRUE,fill=TRUE,sep = '\t')
 demo<-read.table("~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/PNC/Data/decrypt/phs000607.v3.pht007881.v1.p2.c1.Interview_Dates_Update.GRU-NPU.txt",header=TRUE,fill=TRUE)
 allphenodemo<-merge(demo,allpheno,by=c("dbGaP_Subject_ID","SUBJID"))
+hisubjects<-allpheno[grep("HI",allpheno$Race),]
+hisubjectsCNB<-hisubjects[,c("dbGaP_Subject_ID",grep("PCET|PCPT|LNB",names(hisubjects),value=TRUE))]
+
 write.csv(allphenodemo[,c("dbGaP_Subject_ID","Sex")],"~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/PNC/Data/PNCsex.csv")
 write.csv(allphenodemo[,c("dbGaP_Subject_ID","Mother_Education","Father_Education")],"~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/PNC/Data/PNCparentaled.csv")
 write.csv(allphenodemo[,c("dbGaP_Subject_ID","PVRT_CR")],"~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/PNC/Data/PNCPVRT.csv")
@@ -47,8 +50,8 @@ allcogvars<-c(allcogtestsacc,allcogtestslatency)
 testgroups<-c("PADT","PFMT","PEIT","PWMT","PVRT","PEDT","PMAT","VOLT","LNB","PCET","PCPT","PLOT","WRAT","MP")
 efficiencytestgroups<-c("PADT","PFMT","PEIT","PWMT","PVRT","PEDT","PMAT","VOLT","LNB","PCPT","PLOT")
 eftestgroups<-c("PCET","PCPT","LNB") ###EXECUTIVE-CONTROL#HTTPS://WWW.NCBI.NLM.NIH.GOV/PMC/ARTICLES/PMC3295891/PDF/NIHMS348849.PDF
-eftestgroupsplusPVRT<-c("")
-varsvalidgenusclean  <-function(df,subjvar="dbGaP_Subject_ID",agevar="ageAtCnb",vargroup){
+#eftestgroupsplusPVRT<-c("")
+varsvalidgenusclean<-function(df,subjvar="dbGaP_Subject_ID",agevar="ageAtCnb",vargroup){
   allvarsingroup<-grep(vargroup,names(df),value=TRUE)
   datavars<-allvarsingroup[!grepl("VALID|GENUS",allvarsingroup)]
   vargroupdf<-df[,c(allvarsingroup,subjvar,agevar)]
@@ -120,6 +123,8 @@ alleffs<-as.data.frame(do.call(cbind,allefficiency))
 allcogtestsaccwitheffs<-cbind(allvarsgvcleanmat,alleffs)
 
 allcogtestsaccwitheffs$age<-allcogtestsaccwitheffs$ageAtCnb/12
+load(file="~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/PNC/Data/PNCRaceSexinfo.Rdata")
+allcogtestsaccwitheffswithdem<-merge(allcogtestsaccwitheffs,allpheno_r,by="dbGaP_Subject_ID")
 
 write.csv(allcogtestsaccwitheffs,"~/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/R03_behavioral/PNC/Data/btc_PNCscoredmeasures_20220214.csv")
 #allcogtestsaccwitheffs<-read.csv("/Users/brendenclemmens/Desktop/Projects/R03_behavioral/PNC/Data/btc_PNCscoredmeasures_20200605.csv")
